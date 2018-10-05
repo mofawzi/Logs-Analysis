@@ -52,7 +52,7 @@ def main():
 
     # Question - 3
     days_with_errors_query = """
-        select total_days.day,
+        select  TO_CHAR(total_days.day, 'Mon DD, YYYY'),
          round(((errors.error_requests*1.0) / total_days.requests) * 100, 2)
           as percentage
         from (
