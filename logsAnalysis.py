@@ -1,14 +1,21 @@
+#!/usr/bin/env python3
+
+__version__ = '1.0'
+__author__ = "Mohamed Fawzy"
 
 import psycopg2
 
+# Database name
+dbname = "news"
+
+
 def main():
-
-    dbname = "news"
-    #Database Connection
-    db = psycopg2.connect(database = dbname) 
-
+    """This is the main function which calls other functions
+     to display the output """
+    #   Database Connection
+    db = psycopg2.connect(database=dbname)
+    # Database Cursor
     cursor = db.cursor()
-
     # Question - 1
     popular_articles_query = """
         select articles.title, count(*) as view
@@ -23,11 +30,10 @@ def main():
     print(' ')
     for (title, view) in cursor.fetchall():
         print("    {} -- {} views".format(title, view))
-    
     print(' ')
     print(' ')
 
-    #Question - 2
+    # Question - 2
     popular_articles_authors_query = """
         select authors.name, count(*) as num
         from authors, articles, log
@@ -44,9 +50,11 @@ def main():
 
     print(' ')
 
-    #Question - 3
+    # Question - 3
     days_with_errors_query = """
-        select total_days.day, round(((errors.error_requests*1.0) / total_days.requests) * 100, 2) as percentage
+        select total_days.day,
+         round(((errors.error_requests*1.0) / total_days.requests) * 100, 2)
+          as percentage
         from (
           select cast(time as date) as "day", count(*) as error_requests
           from log
@@ -57,7 +65,8 @@ def main():
           from log
           group by day ) as total_days
         on total_days.day = errors.day
-        where (round(((errors.error_requests*1.0) / total_days.requests), 2) > 0.01)
+        where (
+          round(((errors.error_requests*1.0) / total_days.requests), 2)> 0.01)
         order by percentage desc;
     """
 
@@ -72,6 +81,7 @@ def main():
 
     cursor.close()
     db.close()
+
 
 if __name__ == "__main__":
     main()
